@@ -1,9 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { LogOut, User } from "lucide-react";
+import {
+  LogOut,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+  User,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
+import { useSidebarStore } from "@/store/sidebar.store";
 import { logoutUser } from "@/services/auth.service";
 
 export function DashboardHeader() {
@@ -11,6 +18,10 @@ export function DashboardHeader() {
   const user = useAuthStore((s) => s.user);
   const userProfile = useAuthStore((s) => s.userProfile);
   const clearAuth = useAuthStore((s) => s.clearAuth);
+
+  const desktopOpen = useSidebarStore((s) => s.desktopOpen);
+  const toggleDesktop = useSidebarStore((s) => s.toggleDesktop);
+  const toggleMobile = useSidebarStore((s) => s.toggleMobile);
 
   const displayName = userProfile
     ? `${userProfile.firstName ?? ""} ${userProfile.lastName ?? ""}`.trim()
@@ -28,18 +39,44 @@ export function DashboardHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-white px-6">
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-background px-4 sm:px-6">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          className="md:hidden"
+          onClick={toggleMobile}
+          aria-label="Open menu"
+        >
+          <Menu className="h-4 w-4" />
+        </Button>
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          className="hidden md:inline-flex"
+          onClick={toggleDesktop}
+          aria-label={desktopOpen ? "Hide sidebar" : "Show sidebar"}
+        >
+          {desktopOpen ? (
+            <PanelLeftClose className="h-4 w-4" />
+          ) : (
+            <PanelLeftOpen className="h-4 w-4" />
+          )}
+        </Button>
+
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
           CS
         </div>
-        <span className="text-lg font-semibold tracking-tight">
+        <span className="hidden text-lg font-semibold tracking-tight sm:inline">
           Crestwave Technology
         </span>
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="hidden items-center gap-2 text-sm text-muted-foreground sm:flex">
+        <div className="hidden items-center gap-2 text-sm text-muted-foreground lg:flex">
           <User className="h-4 w-4" />
           <span>{displayName || "User"}</span>
           {user?.roles?.map((role) => (
@@ -59,7 +96,7 @@ export function DashboardHeader() {
           className="cursor-pointer gap-2 text-muted-foreground hover:text-destructive"
         >
           <LogOut className="h-4 w-4" />
-          Logout
+          <span className="hidden sm:inline">Logout</span>
         </Button>
       </div>
     </header>

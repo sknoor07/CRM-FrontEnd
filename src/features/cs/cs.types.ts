@@ -2,6 +2,12 @@ export type RepairLocation = "customer_site" | "inlab";
 
 export type ApprovalDecision = "approved" | "rejected";
 
+export interface LatestComment {
+  id: string;
+  userId: string;
+  comment: string;
+  createdAt: string;
+}
 export interface Job {
   id: string;
   jobNumber: string;
@@ -15,6 +21,7 @@ export interface Job {
   assignedDeliveryTechId: string | null;
   createdAt: string;
   updatedAt: string;
+  latestComment: JSON | null;
 }
 
 export interface JobItem {
@@ -58,15 +65,29 @@ export interface JobItem {
 
   createdAt: string;
   updatedAt: string;
+  latestComment: LatestComment | null;
 }
 
 export interface JobWithItems {
   job: Job;
   jobItems: JobItem[];
 }
+export interface CustomerSummary {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+  billingAddress: unknown;
+}
+export interface JobWithCustomerAndItems {
+  job: Job;
+  customer: CustomerSummary;
+  items: JobItem[];
+}
 export interface PendingApprovalRequest {
+  status: string;
   count: number;
-  jobs: JobWithItems[];
+  jobs: JobWithCustomerAndItems[];
 }
 
 export interface PendingApprovalsResponse {

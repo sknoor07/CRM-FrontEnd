@@ -1,6 +1,6 @@
 "use client";
 
-import { PendingFinalQuotesPage } from "@/features/cs/components/PendingFinalQuotesPage";
+import { PendingFinalQuotesPage } from "@/app/(protected)/dashboard/pending-final-quotes/_components/PendingFinalQuotesPage";
 
 export default function PendingFinalQuotesPageWrapper() {
   return <PendingFinalQuotesPage />;
