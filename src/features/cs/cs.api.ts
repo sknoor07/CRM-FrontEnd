@@ -5,9 +5,12 @@ import {
   CloseJobResponse,
   CustomerDetailsResponse,
   CustomerSearchResult,
+  GenerateFinalQuoteRequest,
+  GenerateFinalQuoteResponse,
+  GetQuoteForJobResponse,
   JobWithItems,
-  PendingApprovalRequest,
   PendingApprovalsResponse,
+  PendingFinalQuoteResponse,
   ReadyForClosureResponse,
   SubmitCSJobApprovalInput,
   SubmitCSJobApprovalResponse,
@@ -37,8 +40,10 @@ export async function getCustomerDetailsWithJobs(
   return response.data;
 }
 
-export async function getPendingApprovals(): Promise<PendingApprovalRequest> {
-  const res = await api.get<PendingApprovalRequest>("/cs/pending-approval");
+//////////////////////////////////////////////////////New JOb Submiited by customer/////////////////////////////////////////
+
+export async function getPendingApprovals(): Promise<PendingApprovalsResponse> {
+  const res = await api.get("/cs/pending-approval");
   return res.data;
 }
 
@@ -52,7 +57,34 @@ export async function submitCSJobApproval(
 
   return response.data;
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////getting quote, editing and spending////////////////////////////////////
+
+export async function getJobsWaitngForFinalQuote(): Promise<PendingFinalQuoteResponse> {
+  const res = await api.get<PendingFinalQuoteResponse>(
+    "/cs/pending-final-quotes",
+  );
+  return res.data;
+}
+
+export async function getQuoteDetailsForAJob(
+  jobId: string,
+): Promise<GetQuoteForJobResponse> {
+  const res = await api.get<GetQuoteForJobResponse>(`/cs/jobs/${jobId}/quote`);
+  return res.data;
+}
+
+export async function generateFinalQuote(
+  payload: GenerateFinalQuoteRequest,
+): Promise<GenerateFinalQuoteResponse> {
+  const res = await api.patch("/cs/final-quote", payload);
+  return res.data;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////-----------------------closing a job -----------------------//////////////////////////////
 export async function getJobsReadyForClosure(): Promise<CloseableJob[]> {
   const response = await api.get<ReadyForClosureResponse>(
     "/cs/ready-for-closure",
@@ -74,6 +106,8 @@ export async function closeJob(
   const response = await api.patch<CloseJobResponse>("/cs/close", input);
   return response.data;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Job details API
 export async function getJobDetails(jobId: string) {

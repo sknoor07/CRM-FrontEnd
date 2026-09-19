@@ -23,7 +23,7 @@ export function EstimatedQuoteSummary({
     ["Subtotal", formatCurrency(quote.subtotal)],
     ["Service Charge", formatCurrency(quote.serviceCharge)],
     ["Discount", formatCurrency(quote.discount)],
-    ["Tax", formatCurrency(quote.tax)],
+    ["GST", formatCurrency(quote.tax)],
   ];
 
   return (

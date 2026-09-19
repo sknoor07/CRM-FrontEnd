@@ -21,7 +21,7 @@ export interface Job {
   assignedDeliveryTechId: string | null;
   createdAt: string;
   updatedAt: string;
-  latestComment: JSON | null;
+  latestComment: LatestComment | null;
 }
 
 export interface JobItem {
@@ -84,16 +84,107 @@ export interface JobWithCustomerAndItems {
   customer: CustomerSummary;
   items: JobItem[];
 }
-export interface PendingApprovalRequest {
-  status: string;
-  count: number;
-  jobs: JobWithCustomerAndItems[];
-}
 
 export interface PendingApprovalsResponse {
   count: number;
   jobs: JobWithItems[];
 }
+
+//////////////////get all jobs,items and quote and send to customer for customer approval.//////////////////////////////////
+
+export interface PendingFinalQuoteJob {
+  job: Job;
+  customer: CustomerSummary;
+  items: JobItem[];
+}
+
+export interface PendingFinalQuoteResponse {
+  status: "success" | "error";
+  count: number;
+  jobs: PendingFinalQuoteJob[];
+}
+
+export interface JobQuote {
+  id: string;
+  jobId: string;
+  version: number;
+  subtotal: string;
+  serviceCharge: string;
+  discount: string;
+  tax: string;
+  totalAmount: string;
+  createdByUserId: string;
+  status: string;
+  createdAt: string;
+}
+export interface JobItemQuote {
+  id: string;
+  jobQuoteId: string;
+  jobItemId: string;
+  componentsCost: string;
+  serviceCharge: string;
+  totalAmount: string;
+  createdByUserId: string;
+  createdAt: string;
+}
+export interface JobItemQuoteLine {
+  id: string;
+  quoteId: string;
+  name: string;
+  quantity: number;
+  unitPrice: string;
+  lineTotal: string;
+  sortOrder: number;
+  createdAt: string;
+}
+export interface JobItemQuoteResponse {
+  jobItemId: string;
+  quote: JobItemQuote | null;
+  lines: JobItemQuoteLine[];
+  latestComment: LatestComment | null;
+}
+export interface QuoteDetails {
+  quote: JobQuote | null;
+  latestComment: LatestComment | null;
+  items: JobItemQuoteResponse[];
+}
+export interface GetQuoteForJobResponse {
+  status: "success" | "error";
+  data: QuoteDetails;
+}
+
+export interface FinalQuoteComponentInput {
+  name: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface FinalQuoteItemInput {
+  jobItemId: string;
+  components?: FinalQuoteComponentInput[];
+  serviceCharge?: number;
+  comment?: string;
+}
+
+export interface GenerateFinalQuoteRequest {
+  jobId: string;
+  items: FinalQuoteItemInput[];
+  comment: string;
+  discount?: number;
+  gst?: number;
+}
+
+export interface GenerateFinalQuoteResponse {
+  status: "success" | "error";
+  message?: string;
+  data: {
+    quote: JobQuote;
+    latestComment: LatestComment | null;
+    items: JobItemQuoteResponse[];
+  };
+}
+
+///////////////////////////////////////////////////////////////
 
 export type CloseJobInput = {
   jobId: string;
@@ -304,5 +395,3 @@ export interface JobDetailsResponse {
     }>;
   }>;
 }
-
-//customer

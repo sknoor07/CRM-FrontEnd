@@ -14,7 +14,7 @@ export function JobItemRow({
   itemQuote?: JobItemQuote;
 }) {
   return (
-    <div className="space-y-2 py-3 first:pt-0 last:pb-0 m-1">
+    <div className="space-y-2 py-3 first:pt-0 last:pb-0">
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-sm font-medium">{item.deviceName}</p>

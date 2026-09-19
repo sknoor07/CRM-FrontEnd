@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getPendingApprovals } from "../cs.api";
-import { JobWithItems, PendingApprovalRequest } from "../cs.types";
+import { JobWithItems, PendingApprovalsResponse } from "../cs.types";
 
 export function usePendingApprovals() {
   const [allJobsPendingVerification, setAllJobsPendingVerification] =
-    useState<PendingApprovalRequest>();
+    useState<PendingApprovalsResponse>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

@@ -58,7 +58,7 @@ export function JobList({
 
   return (
     <ScrollArea className="h-full pr-2 sm:pr-4">
-      <div className="space-y-3 pb-4 m-1">
+      <div className="space-y-3 pb-4">
         {jobs.map((item) => (
           <JobCard
             key={item.job.id}
