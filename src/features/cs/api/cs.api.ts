@@ -14,7 +14,7 @@ import {
   ReadyForClosureResponse,
   SubmitCSJobApprovalInput,
   SubmitCSJobApprovalResponse,
-} from "./cs.types";
+} from "../types/cs.types";
 
 //customer api
 export async function searchCustomers(

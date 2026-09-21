@@ -1,4 +1,4 @@
-import { Job, JobItem } from "@/features/cs/cs.types";
+import { Job, JobItem } from "@/features/cs/types/cs.types";
 
 export interface customer {
   userId: string;

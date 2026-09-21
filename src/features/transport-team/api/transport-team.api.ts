@@ -3,6 +3,8 @@ import {
   AssignedJobListItem,
   CompleteInspectionRequest,
   CompleteInspectionResponse,
+  FinishOnsiteRepairRequest,
+  FinishOnsiteRepairResponse,
   GetJobDetailsWithQuoteResponse,
 } from "../types/transport-team.types";
 
@@ -19,6 +21,7 @@ export async function getJobDetailsWithEstimatedQuote(
   const res = await api.get<GetJobDetailsWithQuoteResponse>(
     `/technician/getjobdetailswithestimated-quote/${jobId}`,
   );
+  console.log(res);
   return res.data;
 }
 
@@ -27,6 +30,16 @@ export async function completeTransportInspection(
 ): Promise<CompleteInspectionResponse> {
   const res = await api.post<CompleteInspectionResponse>(
     "/technician/complete-inspection",
+    payload,
+  );
+  return res.data;
+}
+
+export async function finishOnsiteRepair(
+  payload: FinishOnsiteRepairRequest,
+): Promise<FinishOnsiteRepairResponse> {
+  const res = await api.patch<FinishOnsiteRepairResponse>(
+    "/technician/finish-repair",
     payload,
   );
   return res.data;

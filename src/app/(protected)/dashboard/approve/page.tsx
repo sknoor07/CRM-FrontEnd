@@ -7,7 +7,7 @@ import JobCard from "./_cscomponents/JobCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
 import OrderDetailedCard from "./_cscomponents/OrderDetailedCard";
-import { Job, JobWithItems } from "@/features/cs/cs.types";
+import { Job, JobWithItems } from "@/features/cs/types/cs.types";
 import { useAuthStore } from "@/store/auth.store";
 import CsApprovePage from "./_cscomponents/CsApprovePage";
 import TransportApprovePage from "./_transportComponents/TransportApprovePage";

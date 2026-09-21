@@ -4,8 +4,8 @@ import { useState } from "react";
 import {
   GenerateFinalQuoteRequest,
   GenerateFinalQuoteResponse,
-} from "../cs.types";
-import { generateFinalQuote } from "../cs.api";
+} from "../types/cs.types";
+import { generateFinalQuote } from "../api/cs.api";
 import { toast } from "sonner";
 
 function getErrorMessage(error: unknown): string {

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare, Pencil } from "lucide-react";
-import { FinalQuoteComponentInput, JobItem } from "@/features/cs/cs.types";
+import { FinalQuoteComponentInput, JobItem } from "@/features/cs/types/cs.types";
 import { ItemDraft } from "./JobDetailsPanel";
 import { ComponentsEditorDialog } from "./ComponentsEditorDialog";
 

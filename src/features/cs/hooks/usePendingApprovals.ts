@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { getPendingApprovals } from "../cs.api";
-import { JobWithItems, PendingApprovalsResponse } from "../cs.types";
+import { getPendingApprovals } from "../api/cs.api";
+import { JobWithItems, PendingApprovalsResponse } from "../types/cs.types";
 
 export function usePendingApprovals() {
   const [allJobsPendingVerification, setAllJobsPendingVerification] =

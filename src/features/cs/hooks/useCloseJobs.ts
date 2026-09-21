@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { closeJob, getJobsReadyForClosure } from "../cs.api";
-import { CloseJobInput, CloseableJob } from "../cs.types";
+import { closeJob, getJobsReadyForClosure } from "../api/cs.api";
+import { CloseJobInput, CloseableJob } from "../types/cs.types";
 
 function getErrorMessage(error: unknown, fallback: string): string {
   const axiosError = error as {

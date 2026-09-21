@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { PendingFinalQuoteResponse } from "../cs.types";
-import { getJobsWaitngForFinalQuote } from "../cs.api";
+import { PendingFinalQuoteResponse } from "../types/cs.types";
+import { getJobsWaitngForFinalQuote } from "../api/cs.api";
 
 export function useGetJobsWaitingForQuote() {
   const [isLoading, setIsLoading] = useState(true);

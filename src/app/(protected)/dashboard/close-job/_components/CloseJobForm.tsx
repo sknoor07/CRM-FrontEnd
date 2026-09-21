@@ -3,8 +3,8 @@
 import { FormEvent, useMemo, useState } from "react";
 import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCloseJobs } from "../hooks/useCloseJobs";
-import { CloseableJob } from "../cs.types";
+import { useCloseJobs } from "../../../../../features/cs/hooks/useCloseJobs";
+import { CloseableJob } from "../../../../../features/cs/types/cs.types";
 
 function displayJobName(job: CloseableJob): string {
   return job.jobNumber || `Job ${job.id.slice(0, 8)}`;
@@ -104,7 +104,7 @@ export function CloseJobForm() {
 
     if (remarks.length > 2000) {
       setValidationError("Closing remarks cannot exceed 2000 characters.");
-      return;
+      return;  
     }
 
     await submitClose({

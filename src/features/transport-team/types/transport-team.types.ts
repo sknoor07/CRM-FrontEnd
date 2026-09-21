@@ -26,6 +26,7 @@ export type JobItemStatus =
   | "removed_from_quote"
   | "pending_lab_receipt"
   | "received_at_lab"
+  | "repair_started"
   | "assigned_to_repair_manager"
   | "assigned_to_repair_person"
   | "awaiting_customer_approval"
@@ -174,6 +175,20 @@ export interface CompleteInspectionRequest {
 }
 
 export interface CompleteInspectionResponse {
+  message: string;
+  data: {
+    job: Job;
+    items: JobItem[];
+  };
+}
+
+// ---- PATCH /technician/finish-repair ----
+export interface FinishOnsiteRepairRequest {
+  jobId: string;
+  comment?: string;
+}
+
+export interface FinishOnsiteRepairResponse {
   message: string;
   data: {
     job: Job;

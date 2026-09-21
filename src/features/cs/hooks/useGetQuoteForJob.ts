@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { GetQuoteForJobResponse, QuoteDetails } from "../cs.types";
-import { getQuoteDetailsForAJob } from "../cs.api";
+import { GetQuoteForJobResponse, QuoteDetails } from "../types/cs.types";
+import { getQuoteDetailsForAJob } from "../api/cs.api";
 
 export function useGetQuoteForJob(jobId: string | null) {
   const [isLoading, setIsLoading] = useState(false);

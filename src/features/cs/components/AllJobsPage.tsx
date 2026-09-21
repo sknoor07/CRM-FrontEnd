@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Loader2 } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { getJobs, getJobDetails } from "@/features/cs/cs.api";
+import { getJobs, getJobDetails } from "@/features/cs/api/cs.api";
 
 interface JobItem {
   id: string;

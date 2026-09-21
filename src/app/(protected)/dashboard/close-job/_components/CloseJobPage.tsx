@@ -6,8 +6,8 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { getJobsReadyForClosure } from "@/features/cs/cs.api";
-import { CloseableJob } from "@/features/cs/cs.types";
+import { getJobsReadyForClosure } from "@/features/cs/api/cs.api";
+import { CloseableJob } from "@/features/cs/types/cs.types";
 import { Loader2 } from "lucide-react";
 
 interface CloseableJobSummary {

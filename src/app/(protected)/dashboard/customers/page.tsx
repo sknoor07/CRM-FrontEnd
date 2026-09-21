@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import {
   getCustomerDetailsWithJobs,
   searchCustomers,
-} from "@/features/cs/cs.api";
+} from "@/features/cs/api/cs.api";
 import {
   CustomerDetailsResponse,
   CustomerSearchResult,
-} from "@/features/cs/cs.types";
+} from "@/features/cs/types/cs.types";
 
 export default function CustomersPage() {
   const [query, setQuery] = useState("");

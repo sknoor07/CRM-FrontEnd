@@ -10,7 +10,7 @@ import {
   FinalQuoteComponentInput,
   FinalQuoteItemInput,
   PendingFinalQuoteJob,
-} from "@/features/cs/cs.types";
+} from "@/features/cs/types/cs.types";
 
 import { useGetQuoteForJob } from "@/features/cs/hooks/useGetQuoteForJob";
 import { useSubmitFinalQuote } from "@/features/cs/hooks/useSubmitFinalQuote";
@@ -144,10 +144,15 @@ export function JobDetailsPanel({
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h2 className="text-sm font-semibold">Job #{job.job.jobNumber}</h2>
-          <p className="text-xs text-muted-foreground">
-            {job.customer.firstName} {job.customer.lastName}
-          </p>
+          <div>
+            <h2 className="text-sm font-semibold">Job #{job.job.jobNumber}</h2>
+            <p className="text-xs text-muted-foreground">
+              {job.customer.firstName} {job.customer.lastName}
+            </p>
+          </div>
+          <div>
+            
+          </div>
         </div>
       </div>
       {job.job.latestComment && (

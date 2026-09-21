@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { submitCSJobApproval } from "../api/cs.api";
-import {
-  SubmitCSJobApprovalInput,
-  SubmitCSJobApprovalResponse,
-} from "../types/cs.types";
 import { toast } from "sonner";
+import { finishOnsiteRepair } from "../api/transport-team.api";
+import {
+  FinishOnsiteRepairRequest,
+  FinishOnsiteRepairResponse,
+} from "../types/transport-team.types";
 
 function getErrorMessage(error: unknown): string {
   const typedError = error as {
@@ -18,35 +18,32 @@ function getErrorMessage(error: unknown): string {
     typedError.response?.data?.message ??
     typedError.response?.data?.error ??
     typedError.message ??
-    "Unable to submit the job approval."
+    "Unable to complete the onsite repair."
   );
 }
 
-export function useSubmitCSJobApproval() {
+export function useFinishOnsiteRepair() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<SubmitCSJobApprovalResponse | null>(
-    null,
-  );
 
-  async function submit(input: SubmitCSJobApprovalInput) {
+  async function submit(
+    input: FinishOnsiteRepairRequest,
+  ): Promise<FinishOnsiteRepairResponse> {
     setIsSubmitting(true);
     setError(null);
-    setSuccess(null);
 
     try {
-      const result = await submitCSJobApproval(input);
-      setSuccess(result);
+      const result = await finishOnsiteRepair(input);
       return result;
-    } catch (error) {
-      toast.error("Failed to approve.. please contact IT Team ");
-      const message = getErrorMessage(error);
+    } catch (err) {
+      const message = getErrorMessage(err);
       setError(message);
+      toast.error(message);
       throw new Error(message);
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  return { submit, isSubmitting, error, success };
+  return { submit, isSubmitting, error };
 }

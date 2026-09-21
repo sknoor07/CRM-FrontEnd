@@ -30,21 +30,31 @@ export default function Login() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+
+    setError("");
+    setIsLoading(true);
+
     try {
-      e.preventDefault();
-      setIsLoading(true);
       const data = await loginUser(loginDetails);
+
       useAuthStore
         .getState()
         .setAuth(data.accessToken, data.user, data.userProfile);
 
       console.log("Login Successful", data);
+
       router.push("/dashboard");
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      console.log("logging in Failed...", error);
+    } catch (error: any) {
+      console.log("Login Failed:", error);
+
+      const message =
+        error?.response?.data?.error ||
+        "Unable to login. Please check your credentials.";
+
+      setError(message);
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +76,7 @@ export default function Login() {
             <p className="text-muted-foreground">
               Please enter your email and password to login
             </p>
-            <form>
+            <form onSubmit={handleLogin}>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
@@ -119,11 +129,13 @@ export default function Login() {
                   >
                     Forgot Password
                   </Button>
+                  
                 </div>
+               
                 <Button
                   type="submit"
                   className="w-full cursor-pointer"
-                  onClick={(e) => handleLogin(e)}
+                  disabled={isLoading}
                 >
                   {isLoading ? (
                     <Loader2Icon className="animate-spin" />
@@ -131,6 +143,11 @@ export default function Login() {
                     "Login"
                   )}
                 </Button>
+                 {error && (
+                    <div className="rounded-md bg-red-50 border border-red-200 px-4  text-sm text-red-600">
+                      {error}
+                    </div>
+                  )}
               </div>
             </form>
             <div className="relative mt-4">

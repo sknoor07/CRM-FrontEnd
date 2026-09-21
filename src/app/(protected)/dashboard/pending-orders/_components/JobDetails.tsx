@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,7 +10,9 @@ import { CustomerInfoCard } from "./CustomerInfoCard";
 import { EstimatedQuoteSummary } from "./EstimatedQuoteSummary";
 import { InspectionForm } from "./InspectionForm";
 import { JobItemRow } from "./JobItemRow";
+import { RepairCompleteCard } from "./RepairCompleteCard";
 import { StatusBadge } from "./StatusBadge";
+import { getOnsiteRepairPhase } from "@/features/transport-team/utils/onsite-repair-phase";
 
 interface JobDetailsProps {
   jobId: string;
@@ -23,6 +26,13 @@ export function JobDetails({
   onInspectionSubmitted,
 }: JobDetailsProps) {
   const { details, isLoading, error, refetch } = useJobDetailsWithQuote(jobId);
+
+  // Onsite items still waiting on the technician's inspection decision
+  // vs. onsite items already decided and now mid-repair.
+  const { needsInspection, readyForCompletion } = useMemo(
+  () => getOnsiteRepairPhase(details?.jobItems ?? []),
+  [details],
+);
 
   return (
     <div className="flex h-full flex-col">
@@ -69,33 +79,45 @@ export function JobDetails({
 
             <CustomerInfoCard customer={details.customer} />
 
-            <Card className="gap-2 p-3 shadow-sm m-1">
-              <CardHeader className="px-0 pt-0">
-                <CardTitle className="flex items-center gap-1.5 text-sm">
-                  <Package className="h-4 w-4" />
-                  Job Items ({details.jobItems.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-0 divide-y">
-                {details.jobItems.map((item) => (
-                  <JobItemRow
-                    key={item.id}
-                    item={item}
-                    itemQuote={details.quote?.jobItemQuotes.find(
-                      (iq) => iq.jobItemId === item.id,
-                    )}
-                  />
-                ))}
-              </CardContent>
-            </Card>
+            {!needsInspection && readyForCompletion ? (
+              // Inspection is done — the only remaining action is
+              // marking the onsite repair complete.
+              <RepairCompleteCard
+                jobId={details.job.id}
+                items={details.jobItems}
+                onCompleted={onInspectionSubmitted}
+              />
+            ) : (
+              <>
+                <Card className="gap-2 p-3 shadow-sm m-1">
+                  <CardHeader className="px-0 pt-0">
+                    <CardTitle className="flex items-center gap-1.5 text-sm">
+                      <Package className="h-4 w-4" />
+                      Job Items ({details.jobItems.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-0 divide-y">
+                    {details.jobItems.map((item) => (
+                      <JobItemRow
+                        key={item.id}
+                        item={item}
+                        itemQuote={details.quote?.jobItemQuotes.find(
+                          (iq) => iq.jobItemId === item.id,
+                        )}
+                      />
+                    ))}
+                  </CardContent>
+                </Card>
 
-            <EstimatedQuoteSummary quote={details.quote} />
+                <EstimatedQuoteSummary quote={details.quote} />
 
-            <InspectionForm
-              jobId={details.job.id}
-              items={details.jobItems}
-              onSubmitted={onInspectionSubmitted}
-            />
+                <InspectionForm
+                  jobId={details.job.id}
+                  items={details.jobItems}
+                  onSubmitted={onInspectionSubmitted}
+                />
+              </>
+            )}
           </div>
         </ScrollArea>
       )}

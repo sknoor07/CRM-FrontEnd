@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { JobWithItems } from "@/features/cs/cs.types";
+import { JobWithItems } from "@/features/cs/types/cs.types";
 import { useState } from "react";
 
 interface JobCardProps {

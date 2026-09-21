@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
 
-import { Job, JobWithItems } from "@/features/cs/cs.types";
+import { Job, JobWithItems } from "@/features/cs/types/cs.types";
 import JobCard from "./JobCard";
 import OrderDetailedCard from "./OrderDetailedCard";
 
