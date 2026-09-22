@@ -61,7 +61,11 @@ export function useCloseJobs() {
       setJobs((currentJobs) =>
         currentJobs.filter((job) => job.id !== input.jobId),
       );
-      setSuccessMessage(result.message ?? "Job closed successfully.");
+      setSuccessMessage("Job closed successfully.");
+
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000);
       return result;
     } catch (error) {
       const message = getErrorMessage(error, "Unable to close the job.");

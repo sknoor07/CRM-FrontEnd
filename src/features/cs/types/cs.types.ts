@@ -188,7 +188,7 @@ export interface GenerateFinalQuoteResponse {
 
 export type CloseJobInput = {
   jobId: string;
-  customerConfirmed: true;
+  customerConfirmed: boolean;
   paymentConfirmed: boolean;
   closureReason: string;
 };
@@ -213,7 +213,7 @@ export type CloseableCustomer = {
     firstName: string;
     lastName: string;
     phone: string | null;
-    billingAddress: unknown;
+    billingAddress: string | "Address Not Available";
   };
 };
 

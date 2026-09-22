@@ -62,7 +62,7 @@ export default function ApproveJobsPage() {
             {allJobsPendingVerification?.jobs?.map((jobWithItems) => (
               <div
                 key={jobWithItems.job.id}
-                className="cursor-pointer"
+                className="p-2 rounded-xl cursor-pointer shadow-md transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-xl "
                 onClick={() => {
                   setSelectedJobWithItems(jobWithItems);
                   setDetailedForm(true);

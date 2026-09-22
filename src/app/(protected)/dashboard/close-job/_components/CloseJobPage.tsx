@@ -1,155 +1,155 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
-import { getJobsReadyForClosure } from "@/features/cs/api/cs.api";
-import { CloseableJob } from "@/features/cs/types/cs.types";
-import { Loader2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { RefreshCw } from "lucide-react";
 
-interface CloseableJobSummary {
-  id: string;
-  jobNumber: string;
-  currentStatus: string | null;
-  customerId?: string | null;
+import { Button } from "@/components/ui/button";
+import { useCloseJobs } from "../../../../../features/cs/hooks/useCloseJobs";
+import { CloseableJob } from "../../../../../features/cs/types/cs.types";
+
+import { CloseableJobsList } from "./CloseableJobsList";
+import { CloseJobForm } from "./CloseJobForm";
+
+function getCustomerSearchText(job: CloseableJob): string {
+  return [
+    job.customer.profile.firstName,
+    job.customer.profile.lastName,
+    job.customer.profile.phone,
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
-export default function CloseJobPage() {
-  const [jobs, setJobs] = useState<CloseableJobSummary[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const router = useRouter();
+export function CloseJobPage() {
+  const {
+    jobs,
+    isLoading,
+    isClosing,
+    error,
+    successMessage,
+    reload,
+    submitClose,
+  } = useCloseJobs();
 
-  // Get search query from URL params
-  const searchQuery = searchParams.get("q") || "";
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  const selectedJob =
+    jobs.find((job) => job.id === selectedJobId) ?? null;
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      setIsLoading(true);
-      try {
-        const result = await getJobsReadyForClosure();
-        // Map CloseableJob to CloseableJobSummary
-        const summaries = result.map((job) => ({
-          id: job.id,
-          jobNumber: job.jobNumber || job.id,
-          currentStatus: job.currentStatus || null,
-          customerId: job.customerId,
-        }));
-        setJobs(summaries);
-        setIsLoading(false);
-      } catch (err) {
-        console.error("Failed to fetch jobs ready for closure:", err);
-        setError("Failed to load jobs");
-        setIsLoading(false);
-      }
-    };
+  const filteredJobs = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
 
-    fetchJobs();
-  }, [searchQuery]);
-
-  const handleSearch = async (query: string) => {
-    setIsLoading(true);
-    try {
-      const result = await getJobsReadyForClosure();
-      // Map to summaries first, then filter
-      const summaries = result.map((job) => ({
-        id: job.id,
-        jobNumber: job.jobNumber || job.id,
-        currentStatus: job.currentStatus || null,
-        customerId: job.customerId,
-      }));
-      const queryLower = query.trim().toLowerCase();
-      const filtered = summaries.filter((job) => {
-        return (
-          job.jobNumber?.toLowerCase().includes(queryLower) ||
-          (job.customerId?.toString().includes(queryLower) ?? false)
-        );
-      });
-      setJobs(filtered);
-      setIsLoading(false);
-      
-      // Update URL with search query
-      router.push(`?q=${encodeURIComponent(query)}`);
-    } catch (err) {
-      console.error("Search failed:", err);
-      setError("Search failed");
-      setIsLoading(false);
+    if (!query) {
+      return jobs;
     }
-  };
+
+    return jobs.filter((job) => {
+      const customerName = getCustomerSearchText(job);
+
+      return [
+        job.id,
+        job.jobNumber,
+        job.customerId,
+        job.customer.user.email,
+        job.customer.profile.phone,
+        customerName,
+      ]
+        .filter(Boolean)
+        .some((value) =>
+          value!.toLowerCase().includes(query)
+        );
+    });
+  }, [jobs, searchQuery]);
+
+  function handleSelectJob(job: CloseableJob) {
+    setSelectedJobId(job.id);
+  }
+
+  async function handleCloseJob(data: {
+    customerConfirmed: boolean;
+    paymentConfirmed: boolean;
+    closureReason: string;
+  }) {
+    if (!selectedJob) {
+      return;
+    }
+
+    await submitClose({
+      jobId: selectedJob.id,
+      customerConfirmed: data.customerConfirmed,
+      paymentConfirmed: data.paymentConfirmed,
+      closureReason: data.closureReason,
+    });
+
+    setSelectedJobId(null);
+  }
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center gap-2 py-16 text-muted-foreground">
-        <Loader2 className="h-5 w-5 animate-spin" />
+      <p className="text-sm text-muted-foreground">
         Loading jobs ready for closure…
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-        {error}
-        <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>
-          Retry
-        </Button>
-      </div>
+      </p>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Close Job</h1>
-        <p className="text-muted-foreground">
-          Jobs ready for closure - all items delivered or rejected
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-sm text-muted-foreground">
+          {jobs.length === 0
+            ? "There are no jobs ready for closure."
+            : `${jobs.length} job${
+                jobs.length === 1 ? "" : "s"
+              } ready for closure.`}
         </p>
-        
-        <div className="relative">
-          <Input
-            placeholder="Search jobs..."
-            value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="pl-8"
-          />
-        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => void reload()}
+          disabled={isClosing}
+        >
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Refresh
+        </Button>
       </div>
 
-      {jobs.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-16 text-muted-foreground">
-          <Loader2 className="h-10 w-10 opacity-40" />
-          <p className="text-sm">No jobs ready for closure</p>
-          <Button size="sm" onClick={() => window.location.reload()}>
-            Refresh
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {jobs.map((job) => (
-            <div
-              key={job.id}
-              className="p-4 rounded-lg border bg-white hover:bg-muted/5 transition-colors cursor-pointer"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-medium">{job.jobNumber}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {job.currentStatus || "No status"}
-                  </p>
-                </div>
-                <span className="text-xs text-muted-foreground">
-                  Ready for closure
-                </span>
-              </div>
-            </div>
-          ))}
+      {/* Global error */}
+      {error && (
+        <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+          {error}
         </div>
       )}
+
+      {/* Success */}
+      {successMessage && (
+        <div className="rounded-md border border-green-500/30 bg-green-500/10 p-3 text-sm text-green-700">
+          {successMessage}
+        </div>
+      )}
+
+      {/* Main content */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <CloseableJobsList
+          jobs={filteredJobs}
+          searchQuery={searchQuery}
+          selectedJobId={selectedJobId}
+          onSearchChange={setSearchQuery}
+          onSelectJob={handleSelectJob}
+        />
+
+        {selectedJob && (
+          <CloseJobForm
+            job={selectedJob}
+            isClosing={isClosing}
+            error={error}
+            onSubmit={handleCloseJob}
+          />
+        )}
+      </div>
     </div>
   );
 }

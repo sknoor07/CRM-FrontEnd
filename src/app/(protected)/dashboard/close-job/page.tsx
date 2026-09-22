@@ -1,7 +1,9 @@
-"use client";
-
-import CloseJobPage from "@/app/(protected)/dashboard/close-job/_components/CloseJobPage";
+import { CloseJobPage } from "./_components/CloseJobPage";
 
 export default function CloseJobPageWrapper() {
-  return <CloseJobPage />;
+  return (
+    <div className="p-6">
+      <CloseJobPage />
+    </div>
+  );
 }
