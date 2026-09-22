@@ -44,7 +44,9 @@ export function JobDetailsPanel({
   const [drafts, setDrafts] = useState<Record<string, ItemDraft>>({});
   const [jobComment, setJobComment] = useState("");
   const [discount, setDiscount] = useState(0);
-  const [gst, setGst] = useState(0);
+  const [isGstBill, setIsGstBill] = useState(true);
+  const [cgst, setCgst] = useState(0);
+  const [sgst, setSgst] = useState(0);
 
   // Pre-fill drafts once we know both the job items and any previous quote lines
   useEffect(() => {
@@ -74,7 +76,15 @@ export function JobDetailsPanel({
 
     if (quoteDetails?.quote) {
       setDiscount(Number(quoteDetails.quote.discount));
-      setGst(Number(quoteDetails.quote.tax));
+      if (quoteDetails.quote.cgst != null && quoteDetails.quote.sgst != null) {
+        setIsGstBill(true);
+        setCgst(Number(quoteDetails.quote.cgst));
+        setSgst(Number(quoteDetails.quote.sgst));
+      } else {
+        setIsGstBill(false);
+        setCgst(0);
+        setSgst(0);
+      }
     }
   }, [job, quoteDetails]);
 
@@ -123,7 +133,8 @@ export function JobDetailsPanel({
         items,
         comment: jobComment.trim(),
         discount,
-        gst,
+        cgst: isGstBill ? cgst : null,
+        sgst: isGstBill ? sgst : null,
       });
       toast.success("Final quote sent for customer approval.");
       onSubmitted();
@@ -151,7 +162,7 @@ export function JobDetailsPanel({
             </p>
           </div>
           <div>
-            
+
           </div>
         </div>
       </div>
@@ -182,10 +193,14 @@ export function JobDetailsPanel({
           <QuoteAdjustments
             subtotalPreview={subtotalPreview}
             discount={discount}
-            gst={gst}
+            isGstBill={isGstBill}
+            cgst={cgst}
+            sgst={sgst}
             comment={jobComment}
             onDiscountChange={setDiscount}
-            onGstChange={setGst}
+            onIsGstBillChange={setIsGstBill}
+            onCgstChange={setCgst}
+            onSgstChange={setSgst}
             onCommentChange={setJobComment}
           />
         </div>

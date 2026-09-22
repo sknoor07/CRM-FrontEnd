@@ -52,7 +52,7 @@ export function CloseJobPage() {
         job.jobNumber,
         job.customerId,
         job.customer.user.email,
-        job.customer.profile.phone,
+        job.customer.profile.phone  ,
         customerName,
       ]
         .filter(Boolean)

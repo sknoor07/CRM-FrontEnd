@@ -111,7 +111,8 @@ export interface JobQuote {
   subtotal: string;
   serviceCharge: string;
   discount: string;
-  tax: string;
+  cgst: string | null;
+  sgst: string | null;
   totalAmount: string;
   createdByUserId: string;
   status: string;
@@ -171,7 +172,8 @@ export interface GenerateFinalQuoteRequest {
   items: FinalQuoteItemInput[];
   comment: string;
   discount?: number;
-  gst?: number;
+  cgst?: number | null;
+  sgst?: number | null;
 }
 
 export interface GenerateFinalQuoteResponse {

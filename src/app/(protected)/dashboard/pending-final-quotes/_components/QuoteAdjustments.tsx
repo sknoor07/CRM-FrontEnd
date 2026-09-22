@@ -5,30 +5,42 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+
 
 interface QuoteAdjustmentsProps {
   subtotalPreview: number;
   discount: number;
-  gst: number;
+  isGstBill: boolean;
+  cgst: number;
+  sgst: number;
   comment: string;
   onDiscountChange: (value: number) => void;
-  onGstChange: (value: number) => void;
+  onIsGstBillChange: (value: boolean) => void;
+  onCgstChange: (value: number) => void;
+  onSgstChange: (value: number) => void;
   onCommentChange: (value: string) => void;
 }
 
 export function QuoteAdjustments({
   subtotalPreview,
   discount,
-  gst,
+  isGstBill,
+  cgst,
+  sgst,
   comment,
   onDiscountChange,
-  onGstChange,
+  onIsGstBillChange,
+  onCgstChange,
+  onSgstChange,
   onCommentChange,
 }: QuoteAdjustmentsProps) {
   const discountPercent =
     subtotalPreview > 0 ? Math.round((discount / subtotalPreview) * 100) : 0;
-  const gstPercent =
-    subtotalPreview > 0 ? Math.round((gst / subtotalPreview) * 100) : 0;
+  const cgstPercent =
+    subtotalPreview > 0 ? Math.round((cgst / subtotalPreview) * 100) : 0;
+  const sgstPercent =
+    subtotalPreview > 0 ? Math.round((sgst / subtotalPreview) * 100) : 0;
 
   return (
     <Card>
@@ -58,26 +70,71 @@ export function QuoteAdjustments({
           />
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3 rounded-lg border p-3">
           <div className="flex items-center justify-between">
-            <Label className="text-xs">GST / Tax (₹)</Label>
-            <Input
-              type="number"
-              min={0}
-              className="w-24 text-right"
-              value={gst}
-              onChange={(e) => onGstChange(Number(e.target.value) || 0)}
+            <Label htmlFor="gst-bill-toggle" className="text-xs font-medium">
+              Generate GST bill
+            </Label>
+            <Checkbox
+              id="gst-bill-toggle"
+              checked={isGstBill}
+              onCheckedChange={(checked) => onIsGstBillChange(Boolean(checked))}
             />
           </div>
-          <Slider
-            value={[gstPercent]}
-            max={28}
-            step={1}
-            onValueChange={(value) => {
-              const percent = Array.isArray(value) ? value[0] : value;
-              onGstChange(Math.round((subtotalPreview * percent) / 100));
-            }}
-          />
+
+          {!isGstBill && (
+            <p className="text-xs text-muted-foreground">
+              No CGST/SGST will be sent — this will be generated as a non-GST bill.
+            </p>
+          )}
+
+          {isGstBill && (
+            <>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs">CGST (₹)</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    className="w-24 text-right"
+                    value={cgst}
+                    onChange={(e) => onCgstChange(Number(e.target.value) || 0)}
+                  />
+                </div>
+                <Slider
+                  value={[cgstPercent]}
+                  max={14}
+                  step={1}
+                  onValueChange={(value) => {
+                    const percent = Array.isArray(value) ? value[0] : value;
+                    onCgstChange(Math.round((subtotalPreview * percent) / 100));
+                  }}
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs">SGST (₹)</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    className="w-24 text-right"
+                    value={sgst}
+                    onChange={(e) => onSgstChange(Number(e.target.value) || 0)}
+                  />
+                </div>
+                <Slider
+                  value={[sgstPercent]}
+                  max={14}
+                  step={1}
+                  onValueChange={(value) => {
+                    const percent = Array.isArray(value) ? value[0] : value;
+                    onSgstChange(Math.round((subtotalPreview * percent) / 100));
+                  }}
+                />
+              </div>
+            </>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">
