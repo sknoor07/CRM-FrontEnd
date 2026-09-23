@@ -19,11 +19,17 @@ export function EstimatedQuoteSummary({
     );
   }
 
+  const gstRows: Array<[string, string]> = [
+    ...(quote.cgst != null ? [["CGST", formatCurrency(quote.cgst)] as [string, string]] : []),
+    ...(quote.sgst != null ? [["SGST", formatCurrency(quote.sgst)] as [string, string]] : []),
+    ...(quote.igst != null ? [["IGST", formatCurrency(quote.igst)] as [string, string]] : []),
+  ];
+
   const rows: Array<[string, string]> = [
     ["Subtotal", formatCurrency(quote.subtotal)],
     ["Service Charge", formatCurrency(quote.serviceCharge)],
     ["Discount", formatCurrency(quote.discount)],
-    ["GST", formatCurrency(quote.tax)],
+    ...gstRows,
   ];
 
   return (

@@ -104,6 +104,8 @@ export interface PendingFinalQuoteResponse {
   jobs: PendingFinalQuoteJob[];
 }
 
+export type GstType = "none" | "intra_state" | "inter_state";
+
 export interface JobQuote {
   id: string;
   jobId: string;
@@ -113,6 +115,8 @@ export interface JobQuote {
   discount: string;
   cgst: string | null;
   sgst: string | null;
+  igst: string | null;
+  gstType: GstType;
   totalAmount: string;
   createdByUserId: string;
   status: string;
@@ -171,9 +175,11 @@ export interface GenerateFinalQuoteRequest {
   jobId: string;
   items: FinalQuoteItemInput[];
   comment: string;
-  discount?: number;
-  cgst?: number | null;
-  sgst?: number | null;
+  discount: number;
+  cgst: number | null;
+  sgst: number | null;
+  igst: number | null;
+  gstType: GstType;
 }
 
 export interface GenerateFinalQuoteResponse {

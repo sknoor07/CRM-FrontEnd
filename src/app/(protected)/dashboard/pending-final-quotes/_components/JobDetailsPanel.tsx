@@ -14,6 +14,10 @@ import {
 
 import { useGetQuoteForJob } from "@/features/cs/hooks/useGetQuoteForJob";
 import { useSubmitFinalQuote } from "@/features/cs/hooks/useSubmitFinalQuote";
+import {
+  finalQuoteGstSchema,
+  getQuoteGstDefaults,
+} from "@/features/cs/validation/final-quote.schema";
 import { QuoteAdjustments } from "./QuoteAdjustments";
 import { QuoteItemCard } from "./QuoteItemCard";
 
@@ -44,9 +48,10 @@ export function JobDetailsPanel({
   const [drafts, setDrafts] = useState<Record<string, ItemDraft>>({});
   const [jobComment, setJobComment] = useState("");
   const [discount, setDiscount] = useState(0);
-  const [isGstBill, setIsGstBill] = useState(true);
-  const [cgst, setCgst] = useState(0);
-  const [sgst, setSgst] = useState(0);
+  const [gstType, setGstType] = useState<"none" | "intra_state" | "inter_state">("none");
+  const [cgst, setCgst] = useState("");
+  const [sgst, setSgst] = useState("");
+  const [igst, setIgst] = useState("");
 
   // Pre-fill drafts once we know both the job items and any previous quote lines
   useEffect(() => {
@@ -74,18 +79,12 @@ export function JobDetailsPanel({
     }
     setDrafts(next);
 
-    if (quoteDetails?.quote) {
-      setDiscount(Number(quoteDetails.quote.discount));
-      if (quoteDetails.quote.cgst != null && quoteDetails.quote.sgst != null) {
-        setIsGstBill(true);
-        setCgst(Number(quoteDetails.quote.cgst));
-        setSgst(Number(quoteDetails.quote.sgst));
-      } else {
-        setIsGstBill(false);
-        setCgst(0);
-        setSgst(0);
-      }
-    }
+    setDiscount(quoteDetails?.quote ? Number(quoteDetails.quote.discount) : 0);
+    const gstDefaults = getQuoteGstDefaults(quoteDetails?.quote);
+    setGstType(gstDefaults.gstType);
+    setCgst(gstDefaults.cgst);
+    setSgst(gstDefaults.sgst);
+    setIgst(gstDefaults.igst);
   }, [job, quoteDetails]);
 
   const subtotalPreview = useMemo(
@@ -98,7 +97,10 @@ export function JobDetailsPanel({
       ),
     [drafts],
   );
-
+  const serviceChargePreview = Object.values(drafts).reduce(
+    (sum, draft) => sum + (draft.serviceCharge ?? 0),
+    0,
+  );
   if (!job) return null;
 
   const updateDraft = (jobItemId: string, patch: Partial<ItemDraft>) => {
@@ -111,6 +113,18 @@ export function JobDetailsPanel({
   const handleSubmit = async () => {
     if (!jobComment.trim()) {
       toast.error("Please add a comment before submitting.");
+      return;
+    }
+
+    const gstResult = finalQuoteGstSchema.safeParse({
+      gstType,
+      cgst,
+      sgst,
+      igst,
+    });
+    if (!gstResult.success) {
+      console.log(gstResult.error.issues);
+      toast.error(gstResult.error.issues[0]?.message ?? "Please check the GST amounts.");
       return;
     }
 
@@ -133,8 +147,10 @@ export function JobDetailsPanel({
         items,
         comment: jobComment.trim(),
         discount,
-        cgst: isGstBill ? cgst : null,
-        sgst: isGstBill ? sgst : null,
+        gstType: gstResult.data.gstType,
+        cgst: gstResult.data.gstType === "intra_state" ? Number(gstResult.data.cgst) : null,
+        sgst: gstResult.data.gstType === "intra_state" ? Number(gstResult.data.sgst) : null,
+        igst: gstResult.data.gstType === "inter_state" ? Number(gstResult.data.igst) : null,
       });
       toast.success("Final quote sent for customer approval.");
       onSubmitted();
@@ -192,15 +208,25 @@ export function JobDetailsPanel({
 
           <QuoteAdjustments
             subtotalPreview={subtotalPreview}
+            serviceChargePreview={serviceChargePreview}
             discount={discount}
-            isGstBill={isGstBill}
+            gstType={gstType}
             cgst={cgst}
             sgst={sgst}
+            igst={igst}
             comment={jobComment}
             onDiscountChange={setDiscount}
-            onIsGstBillChange={setIsGstBill}
+            onGstTypeChange={(value) => {
+              setGstType(value);
+              if (value !== "intra_state") {
+                setCgst("");
+                setSgst("");
+              }
+              if (value !== "inter_state") setIgst("");
+            }}
             onCgstChange={setCgst}
             onSgstChange={setSgst}
+            onIgstChange={setIgst}
             onCommentChange={setJobComment}
           />
         </div>

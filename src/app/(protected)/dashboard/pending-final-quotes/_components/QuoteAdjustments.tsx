@@ -1,151 +1,295 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-
+import type { GstType } from "@/features/cs/types/cs.types";
+import { useEffect } from "react";
 
 interface QuoteAdjustmentsProps {
   subtotalPreview: number;
+  serviceChargePreview: number;
   discount: number;
-  isGstBill: boolean;
-  cgst: number;
-  sgst: number;
+  gstType: GstType;
   comment: string;
+
   onDiscountChange: (value: number) => void;
-  onIsGstBillChange: (value: boolean) => void;
-  onCgstChange: (value: number) => void;
-  onSgstChange: (value: number) => void;
+  onGstTypeChange: (value: GstType) => void;
   onCommentChange: (value: string) => void;
+
+  onCgstChange: (value: string) => void;
+  onSgstChange: (value: string) => void;
+  onIgstChange: (value: string) => void;
+
+  cgst: string;
+  sgst: string;
+  igst: string;
 }
 
 export function QuoteAdjustments({
   subtotalPreview,
+  serviceChargePreview,
   discount,
-  isGstBill,
-  cgst,
-  sgst,
+  gstType,
   comment,
+
   onDiscountChange,
-  onIsGstBillChange,
+  onGstTypeChange,
+  onCommentChange,
+
   onCgstChange,
   onSgstChange,
-  onCommentChange,
+  onIgstChange,
+
+  cgst,
+  sgst,
+  igst,
 }: QuoteAdjustmentsProps) {
-  const discountPercent =
-    subtotalPreview > 0 ? Math.round((discount / subtotalPreview) * 100) : 0;
-  const cgstPercent =
-    subtotalPreview > 0 ? Math.round((cgst / subtotalPreview) * 100) : 0;
-  const sgstPercent =
-    subtotalPreview > 0 ? Math.round((sgst / subtotalPreview) * 100) : 0;
+  // ---------------------------------------------
+  // Taxable amount
+  // ---------------------------------------------
+
+  const taxableAmount = Math.max(
+    subtotalPreview +
+      serviceChargePreview -
+      discount,
+    0,
+  );
+
+  // ---------------------------------------------
+  // GST calculation
+  // ---------------------------------------------
+
+  const calculatedCgst =
+    gstType === "intra_state"
+      ? Math.round(taxableAmount * 0.09 * 100) / 100
+      : 0;
+
+  const calculatedSgst =
+    gstType === "intra_state"
+      ? Math.round(taxableAmount * 0.09 * 100) / 100
+      : 0;
+
+  const calculatedIgst =
+    gstType === "inter_state"
+      ? Math.round(taxableAmount * 0.18 * 100) / 100
+      : 0;
+
+  useEffect(() => {
+  if (gstType === "intra_state") {
+    onCgstChange(calculatedCgst.toFixed(2));
+    onSgstChange(calculatedSgst.toFixed(2));
+  } else if (gstType === "inter_state") {
+    onIgstChange(calculatedIgst.toFixed(2));
+  }
+}, [gstType, calculatedCgst, calculatedSgst, calculatedIgst]);
+
+  const gstAmount =
+    calculatedCgst +
+    calculatedSgst +
+    calculatedIgst;
+
+  // ---------------------------------------------
+  // Final amount
+  // ---------------------------------------------
+
+  const totalAmount =
+    Math.round(
+      (taxableAmount + gstAmount) * 100,
+    ) / 100;
 
   return (
     <Card>
       <CardHeader className="p-4 pb-2">
-        <CardTitle className="text-sm">Quote adjustments</CardTitle>
+        <CardTitle className="text-sm">
+          Quote adjustments
+        </CardTitle>
       </CardHeader>
+
       <CardContent className="flex flex-col gap-5 p-4 pt-2">
+
+        {/* Discount */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <Label className="text-xs">Discount (₹)</Label>
+            <Label className="text-xs">
+              Discount (₹)
+            </Label>
+
             <Input
               type="number"
               min={0}
+              max={subtotalPreview}
               className="w-24 text-right"
               value={discount}
-              onChange={(e) => onDiscountChange(Number(e.target.value) || 0)}
+              onChange={(e) =>
+                onDiscountChange(
+                  Math.min(
+                    Number(e.target.value) || 0,
+                    subtotalPreview,
+                  ),
+                )
+              }
             />
           </div>
-          <Slider
-            value={[discountPercent]}
-            max={50}
-            step={1}
-            onValueChange={(value) => {
-              const percent = Array.isArray(value) ? value[0] : value;
-              onDiscountChange(Math.round((subtotalPreview * percent) / 100));
-            }}
-          />
         </div>
 
+        {/* GST */}
         <div className="flex flex-col gap-3 rounded-lg border p-3">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="gst-bill-toggle" className="text-xs font-medium">
-              Generate GST bill
+
+          <div className="flex items-center justify-between gap-3">
+            <Label
+              htmlFor="gst-type"
+              className="text-xs font-medium"
+            >
+              GST type
             </Label>
-            <Checkbox
-              id="gst-bill-toggle"
-              checked={isGstBill}
-              onCheckedChange={(checked) => onIsGstBillChange(Boolean(checked))}
-            />
+
+            <Select
+              value={gstType}
+              onValueChange={(value) => {
+                if (value) {
+                  onGstTypeChange(
+                    value as GstType,
+                  );
+                }
+              }}
+            >
+              <SelectTrigger
+                id="gst-type"
+                className="w-40"
+              >
+                <SelectValue />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="none">
+                  No GST
+                </SelectItem>
+
+                <SelectItem value="intra_state">
+                  Intra-state GST
+                </SelectItem>
+
+                <SelectItem value="inter_state">
+                  Inter-state GST
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          {!isGstBill && (
+          {gstType !== "none" && (
+            <div className="rounded-md bg-muted/50 p-3 text-sm">
+
+              {/* Taxable Amount */}
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  Taxable amount before GST
+                </span>
+
+                <span>
+                  ₹ {taxableAmount.toFixed(2)}
+                </span>
+              </div>
+
+              {/* CGST */}
+              {gstType === "intra_state" && (
+                <div className="mt-2 flex justify-between">
+                  <span className="text-muted-foreground">
+                    CGST (9%)
+                  </span>
+
+                  <span>
+                    ₹ {calculatedCgst.toFixed(2)}
+                  </span>
+                </div>
+              )}
+
+              {/* SGST */}
+              {gstType === "intra_state" && (
+                <div className="mt-2 flex justify-between">
+                  <span className="text-muted-foreground">
+                    SGST (9%)
+                  </span>
+
+                  <span>
+                    ₹ {calculatedSgst.toFixed(2)}
+                  </span>
+                </div>
+              )}
+
+              {/* IGST */}
+              {gstType === "inter_state" && (
+                <div className="mt-2 flex justify-between">
+                  <span className="text-muted-foreground">
+                    IGST (18%)
+                  </span>
+
+                  <span>
+                    ₹ {calculatedIgst.toFixed(2)}
+                  </span>
+                </div>
+              )}
+
+              {/* Total GST */}
+              <div className="mt-2 flex justify-between border-t pt-2 font-medium">
+                <span>Total GST</span>
+
+                <span>
+                  ₹ {gstAmount.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {gstType === "none" && (
             <p className="text-xs text-muted-foreground">
-              No CGST/SGST will be sent — this will be generated as a non-GST bill.
+              No GST will be charged.
             </p>
           )}
-
-          {isGstBill && (
-            <>
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <Label className="text-xs">CGST (₹)</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    className="w-24 text-right"
-                    value={cgst}
-                    onChange={(e) => onCgstChange(Number(e.target.value) || 0)}
-                  />
-                </div>
-                <Slider
-                  value={[cgstPercent]}
-                  max={14}
-                  step={1}
-                  onValueChange={(value) => {
-                    const percent = Array.isArray(value) ? value[0] : value;
-                    onCgstChange(Math.round((subtotalPreview * percent) / 100));
-                  }}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <Label className="text-xs">SGST (₹)</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    className="w-24 text-right"
-                    value={sgst}
-                    onChange={(e) => onSgstChange(Number(e.target.value) || 0)}
-                  />
-                </div>
-                <Slider
-                  value={[sgstPercent]}
-                  max={14}
-                  step={1}
-                  onValueChange={(value) => {
-                    const percent = Array.isArray(value) ? value[0] : value;
-                    onSgstChange(Math.round((subtotalPreview * percent) / 100));
-                  }}
-                />
-              </div>
-            </>
-          )}
         </div>
 
+        {/* Total */}
+        <div className="flex justify-end border-t pt-3">
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground">
+              Total Amount
+            </p>
+
+            <p className="text-xl font-semibold">
+              ₹ {totalAmount.toFixed(2)}
+            </p>
+          </div>
+        </div>
+
+        {/* Comment */}
         <div className="flex flex-col gap-1.5">
-          <Label className="text-xs">Comment (required)</Label>
+          <Label className="text-xs">
+            Comment (required)
+          </Label>
+
           <Textarea
             rows={3}
             value={comment}
-            onChange={(e) => onCommentChange(e.target.value)}
+            onChange={(e) =>
+              onCommentChange(e.target.value)
+            }
             placeholder="Summary shown to the customer, e.g. Final quote covers screen replacement and battery."
           />
         </div>
+
       </CardContent>
     </Card>
   );

@@ -110,6 +110,8 @@ export interface GetAssignedJobsResponse {
 // ---- GET /technician/getjobdetailswithestimated-quote/:id ----
 export type JobQuoteStatus = "estimate" | "pending" | "final" | "rejected";
 
+import type { GstType } from "@/features/cs/types/cs.types";
+
 export interface JobQuote {
   id: string;
   jobId: string;
@@ -117,7 +119,10 @@ export interface JobQuote {
   subtotal: string;
   serviceCharge: string;
   discount: string;
-  tax: string;
+  cgst: string | null;
+  sgst: string | null;
+  igst: string | null;
+  gstType: GstType;
   totalAmount: string;
   createdByUserId: string;
   status: JobQuoteStatus;

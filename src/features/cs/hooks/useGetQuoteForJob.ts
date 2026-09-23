@@ -9,6 +9,7 @@ export function useGetQuoteForJob(jobId: string | null) {
 
   const refetch = useCallback(async () => {
     if (!jobId) return;
+    setData(null);
     setIsLoading(true);
     setError(null);
     try {
