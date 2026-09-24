@@ -1,5 +1,6 @@
 import api from "@/lib/api-client";
 import {
+
   CloseableJob,
   CloseJobInput,
   CloseJobResponse,
@@ -7,8 +8,9 @@ import {
   CustomerSearchResult,
   GenerateFinalQuoteRequest,
   GenerateFinalQuoteResponse,
+  GetJobsParams,
+  GetJobWithItemsResponse,
   GetQuoteForJobResponse,
-  JobWithItems,
   PendingApprovalsResponse,
   PendingFinalQuoteResponse,
   ReadyForClosureResponse,
@@ -115,7 +117,10 @@ export async function getJobDetails(jobId: string) {
   return res.data;
 }
 
-export async function getJobs(query: string = ""): Promise<JobWithItems[]> {
-  const res = await api.get<{ jobs: JobWithItems[] }>(`/cs/jobs?q=${query}`);
-  return res.data.jobs;
+export async function getJobs(params:GetJobsParams): Promise<GetJobWithItemsResponse> {
+  const res = await api.get< GetJobWithItemsResponse >("/jobs/jobs-with-items",{
+    params
+    });
+  console.log(res.data.result);
+  return res.data;
 }

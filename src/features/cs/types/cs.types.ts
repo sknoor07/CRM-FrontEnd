@@ -1,3 +1,5 @@
+import { CustomerProfile } from "@/features/transport-team/types/transport-team.types";
+
 export type RepairLocation = "customer_site" | "inlab";
 
 export type ApprovalDecision = "approved" | "rejected";
@@ -68,9 +70,23 @@ export interface JobItem {
   latestComment: LatestComment | null;
 }
 
+
+export interface CustomerProfileForJobDeatils {
+  firstName: string,
+  lastName: string,
+  phone: string | null,
+  email: string,
+  billingAddress: string | null,
+  gstin: string | null,
+}
 export interface JobWithItems {
+  customer: CustomerProfileForJobDeatils
   job: Job;
   jobItems: JobItem[];
+}
+
+export interface AlljobApiResult {
+  result: JobWithItems[];
 }
 export interface CustomerSummary {
   userId: string;
@@ -402,4 +418,45 @@ export interface JobDetailsResponse {
       updatedAt: string;
     }>;
   }>;
+}
+
+export interface GetJobsParams{
+  page:number;
+  limit:number;
+  search:string;
+}
+
+
+// 2. Define the mapped customer object returned by the controller
+export interface MappedCustomerProfile {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  billingAddress: string | null;
+  gstin: string | null;
+}
+
+// 3. Define the structure of a single result item
+export interface JobWithItemsResult {
+  job: Job;
+  customer: MappedCustomerProfile;
+  jobItems: JobItem[];
+}
+
+// 4. Define the pagination structure (keeping the spelling from your controller)
+export interface PaginationMetadata {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean; 
+}
+
+// 5. Define the final overall response type
+export interface GetJobWithItemsResponse {
+  message: string;
+  result: JobWithItemsResult[];
+  pagination: PaginationMetadata;
 }
