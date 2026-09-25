@@ -94,7 +94,10 @@ export function QuoteItemCard({ item, draft, onChange }: QuoteItemCardProps) {
                     {component.name}{" "}
                     <span className="text-xs text-muted-foreground">
                       {" "}
-                      × {component.quantity}{" "}
+                      × {component.quantity}
+                      {component.warrantyMonths
+                        ? ` · ${component.warrantyMonths}mo warranty`
+                        : ""}{" "}
                     </span>{" "}
                   </span>{" "}
                   <span className="tabular-nums">

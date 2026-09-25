@@ -48,7 +48,10 @@ export function ComponentsEditorDialog({
   };
 
   const addRow = () => {
-    setRows((prev) => [...prev, { name: "", quantity: 1, unitPrice: 0 }]);
+    setRows((prev) => [
+      ...prev,
+      { name: "", quantity: 1, unitPrice: 0, warrantyMonths: 0 },
+    ]);
   };
 
   const subtotal = rows.reduce((sum, r) => sum + r.quantity * r.unitPrice, 0);
@@ -63,38 +66,74 @@ export function ComponentsEditorDialog({
         <ScrollArea className="max-h-72">
           <div className="flex flex-col gap-2 pr-3">
             {rows.map((row, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <Input
-                  className="flex-1"
-                  placeholder="Component name"
-                  value={row.name}
-                  onChange={(e) => updateRow(index, { name: e.target.value })}
-                />
-                <Input
-                  className="w-16"
-                  type="number"
-                  min={1}
-                  value={row.quantity}
-                  onChange={(e) =>
-                    updateRow(index, { quantity: Number(e.target.value) || 1 })
-                  }
-                />
-                <Input
-                  className="w-24"
-                  type="number"
-                  min={0}
-                  value={row.unitPrice}
-                  onChange={(e) =>
-                    updateRow(index, { unitPrice: Number(e.target.value) || 0 })
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeRow(index)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+              <div
+                key={index}
+                className="flex flex-col gap-1.5 rounded-md border p-2"
+              >
+                <div className="flex items-center gap-2">
+                  <Input
+                    className="flex-1"
+                    placeholder="Component name"
+                    value={row.name}
+                    onChange={(e) =>
+                      updateRow(index, { name: e.target.value })
+                    }
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeRow(index)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex flex-1 flex-col gap-1">
+                    <span className="text-[10px] text-muted-foreground">
+                      Qty
+                    </span>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={row.quantity}
+                      onChange={(e) =>
+                        updateRow(index, {
+                          quantity: Number(e.target.value) || 1,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col gap-1">
+                    <span className="text-[10px] text-muted-foreground">
+                      Unit price (₹)
+                    </span>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={row.unitPrice}
+                      onChange={(e) =>
+                        updateRow(index, {
+                          unitPrice: Number(e.target.value) || 0,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col gap-1">
+                    <span className="text-[10px] text-muted-foreground">
+                      Warranty (months)
+                    </span>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={row.warrantyMonths ?? 0}
+                      onChange={(e) =>
+                        updateRow(index, {
+                          warrantyMonths: Number(e.target.value) || 0,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
               </div>
             ))}
 

@@ -156,6 +156,7 @@ export interface JobItemQuoteLine {
   unitPrice: string;
   lineTotal: string;
   sortOrder: number;
+  warrantyMonths: number;
   createdAt: string;
 }
 export interface JobItemQuoteResponse {
@@ -178,6 +179,7 @@ export interface FinalQuoteComponentInput {
   name: string;
   quantity: number;
   unitPrice: number;
+  warrantyMonths: number;
 }
 
 export interface FinalQuoteItemInput {

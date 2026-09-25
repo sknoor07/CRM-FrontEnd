@@ -65,6 +65,7 @@ export function JobDetailsPanel({
           name: line.name,
           quantity: line.quantity,
           unitPrice: Number(line.unitPrice),
+          warrantyMonths: line.warrantyMonths ?? 0,
         })) ?? [];
 
       next[item.id] = {
