@@ -74,7 +74,7 @@ export function JobDetails({
               <h2 className="font-heading text-lg font-semibold">
                 {details.job.jobNumber}
               </h2>
-              <StatusBadge status={details.job.currentStatus} />
+              <StatusBadge status={details.jobItems[0].isWarrantyClaim ? "in_warranty_inspection":details.job.currentStatus} />
             </div>
 
             <CustomerInfoCard customer={details.customer} />

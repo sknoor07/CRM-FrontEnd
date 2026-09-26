@@ -26,6 +26,7 @@ function resolveTone(status: string): { label: string; tone: BadgeTone } {
     closed: { label: "Closed", tone: "success" },
     done: { label: "Done", tone: "success" },
     cancelled: { label: "Cancelled", tone: "destructive" },
+    in_warranty_inspection:{label:"In Warranty Inspection",tone:"info"},
   };
 
   return (
